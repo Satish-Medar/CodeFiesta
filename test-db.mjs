@@ -4,7 +4,7 @@ mongoose.connect('mongodb+srv://medarsatish32_db_user:iYYR8MNEs3G4vNsD@cluster0.
   .then(async () => {
     const EventSchema = new mongoose.Schema({}, { strict: false });
     const Event = mongoose.model('Event', EventSchema);
-    const events = await Event.find({ subCategory: { $exists: true, $ne: null } }, 'title category subCategory').sort({createdAt: -1}).limit(10);
+    const events = await Event.find({}, 'title category subCategory').sort({createdAt: -1}).limit(20);
     console.log(JSON.stringify(events, null, 2));
     process.exit(0);
   })
