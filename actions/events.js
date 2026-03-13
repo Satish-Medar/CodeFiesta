@@ -19,7 +19,7 @@ export async function createEvent(data) {
     const hasPro = data.hasPro || false;
 
     // Verify limit for free users
-    if (!hasPro && user.freeEventsCreated >= 1) {
+    if (!hasPro && user.freeEventsCreated >= 5) {
       throw new Error('Free event limit reached. Please upgrade to Pro to create more events.')
     }
 

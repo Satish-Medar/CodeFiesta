@@ -10,6 +10,7 @@ const EventSchema = new mongoose.Schema(
     organizerName: { type: String, required: true },
     
     category: { type: String, required: true, index: true },
+    subCategory: { type: String },
     tags: { type: [String], default: [] },
     
     startDate: { type: Date, required: true, index: true },
@@ -37,4 +38,9 @@ const EventSchema = new mongoose.Schema(
 // Search index for title
 EventSchema.index({ title: 'text' });
 
-export default mongoose.models.Event || mongoose.model('Event', EventSchema);
+// Clear mongoose model cache for development HMR
+if (mongoose.models && mongoose.models.Event) {
+  delete mongoose.models.Event;
+}
+
+export default mongoose.model('Event', EventSchema);

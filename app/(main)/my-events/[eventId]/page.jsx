@@ -218,8 +218,7 @@ export default function EventDashboardPage() {
         {stats.isEventToday && !stats.isEventPast && (
           <Button
             size="lg"
-            // variant="outline"
-            className="mb-8 w-full gap-2 h-10 bg-linear-to-r from-orange-500 via-pink-500 to-red-500 text-white hover:scale-[1.02]"
+            className="mb-8 w-full gap-2 h-10 bg-slate-900 text-slate-50 hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
             onClick={() => setShowQRScanner(true)}
           >
             <QrCode className="w-6 h-6" />

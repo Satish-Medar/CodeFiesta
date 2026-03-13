@@ -21,6 +21,7 @@ Return this exact JSON structure:
   "title": "Event title (catchy and professional, single line)",
   "description": "Detailed event description in a single paragraph. Use spaces instead of line breaks. Make it 2-3 sentences describing what attendees will learn and experience.",
   "category": "One of: tech, music, sports, art, food, business, health, education, gaming, networking, outdoor, community",
+  "subCategory": "Optional sub-category based on the category chosen (e.g. hackathon for tech, concert for music, etc)",
   "suggestedCapacity": 50,
   "suggestedTicketType": "free"
 }

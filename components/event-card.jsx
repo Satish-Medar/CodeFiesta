@@ -3,7 +3,7 @@
 import { Calendar, MapPin, Users, Trash2, X, QrCode, Eye } from "lucide-react";
 import { format } from "date-fns";
 import Image from "next/image";
-import { getCategoryIcon, getCategoryLabel } from "@/lib/data";
+import { getCategoryIcon, getCategoryLabel, getSubCategoryLabel } from "@/lib/data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,12 +15,15 @@ export default function EventCard({
   variant = "grid", // "grid" or "list"
   action = null, // "event" | "ticket" | null
   className = "",
+  currentUser = null, // Added to check for ownership
 }) {
+  const isOwner = currentUser && (currentUser._id === event.organizerId || currentUser.id === event.organizerId);
+
   // List variant (compact horizontal layout)
   if (variant === "list") {
     return (
       <Card
-        className={`py-0 group cursor-pointer hover:shadow-lg transition-all hover:border-purple-500/50 ${className}`}
+        className={`py-0 group cursor-pointer hover:shadow-sm hover:border-gray-300 dark:hover:border-zinc-700 transition-none ${className}`}
         onClick={onClick}
       >
         <CardContent className="p-3 flex gap-3">
@@ -45,8 +48,26 @@ export default function EventCard({
 
           {/* Event Details */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-sm mb-1 group-hover:text-purple-400 transition-colors line-clamp-2">
+            <div className="flex items-center gap-1 mb-1">
+              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                {getCategoryLabel(event.category)}
+              </span>
+              {event.subCategory && (
+                <>
+                  <span className="text-[10px] text-muted-foreground">•</span>
+                  <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                    {getSubCategoryLabel(event.category, event.subCategory)}
+                  </span>
+                </>
+              )}
+            </div>
+            <h3 className="font-semibold text-sm mb-1 line-clamp-2">
               {event.title}
+              {isOwner && (
+                <span className="ml-2 inline-flex items-center rounded-md bg-slate-100 dark:bg-zinc-800 px-2 py-0.5 text-xs font-medium text-slate-700 dark:text-zinc-300 ring-1 ring-inset ring-slate-200 dark:ring-zinc-700 whitespace-nowrap align-middle">
+                  Created by You
+                </span>
+              )}
             </h3>
             <p className="text-xs text-muted-foreground mb-1">
               {format(event.startDate, "EEE, dd MMM, HH:mm")}
@@ -70,7 +91,7 @@ export default function EventCard({
   // Grid variant (default - original design)
   return (
     <Card
-      className={`overflow-hidden group pt-0 ${onClick ? "cursor-pointer hover:shadow-lg transition-all hover:border-purple-500/50" : ""} ${className}`}
+      className={`overflow-hidden group pt-0 ${onClick ? "cursor-pointer hover:shadow-sm hover:border-gray-300 dark:hover:border-zinc-700 transition-none" : ""} ${className}`}
       onClick={onClick}
     >
       <div className="relative h-48 overflow-hidden">
@@ -78,7 +99,7 @@ export default function EventCard({
           <Image
             src={event.coverImage}
             alt={event.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+            className="w-full h-full object-cover"
             width={500}
             height={192}
             priority
@@ -100,12 +121,26 @@ export default function EventCard({
 
       <CardContent className="space-y-3">
         <div>
-          <Badge variant="outline" className="mb-2">
-            {getCategoryIcon(event.category)} {getCategoryLabel(event.category)}
-          </Badge>
-          <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-purple-400 transition-colors">
+          <div className="flex flex-wrap gap-2 mb-2">
+            <Badge variant="outline">
+              {getCategoryIcon(event.category)} {getCategoryLabel(event.category)}
+            </Badge>
+            {event.subCategory && (
+              <Badge variant="secondary">
+                {getSubCategoryLabel(event.category, event.subCategory)}
+              </Badge>
+            )}
+          </div>
+          <h3 className="font-semibold text-lg line-clamp-2 text-foreground">
             {event.title}
           </h3>
+          {isOwner && (
+            <div className="mt-1">
+              <span className="inline-flex items-center rounded-md bg-slate-100 dark:bg-zinc-800 px-2 py-1 text-xs font-medium text-slate-700 dark:text-zinc-300 ring-1 ring-inset ring-slate-200 dark:ring-zinc-700">
+                Created by You
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="space-y-2 text-sm text-muted-foreground">

@@ -37,7 +37,7 @@ export default function UpgradeModal({ isOpen, onClose, trigger = "limit" }) {
               $9.99<span className="text-sm font-normal text-muted-foreground">/mo</span>
             </div>
             <Button
-              className="w-full bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+              className="w-full bg-slate-900 text-slate-50 hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
               onClick={() => {
                 // Mock upgrade logic here or redirect to Stripe checkout
                 window.alert("Billing integration pending. This is a mock upgrade button.");

@@ -37,9 +37,24 @@ Return this exact JSON structure:
   "title": "Event title (catchy and professional, single line)",
   "description": "Detailed event description in a single paragraph. Use spaces instead of line breaks. Make it 2-3 sentences describing what attendees will learn and experience.",
   "category": "One of: tech, music, sports, art, food, business, health, education, gaming, networking, outdoor, community",
+  "subCategory": "Optional sub-category ID based on the category chosen. MUST be one of the predefined IDs for that category.",
   "suggestedCapacity": 50,
   "suggestedTicketType": "free"
 }
+
+Valid Categories and their Sub-Category IDs:
+- tech (hackathon, coding-event, tech-meetup, conference, workshop)
+- music (concert, festival, live-performance, dj-set, open-mic)
+- sports (tournament, match, fitness-class, marathon, esports)
+- art (exhibition, cultural-event, creative-workshop, theater, poetry)
+- food (food-festival, cooking-class, tasting, pop-up, networking-dinner)
+- business (networking, conference, startup-meetup, seminar, trade-show)
+- health (yoga, meditation, wellness-workshop, health-seminar, retreat)
+- education (workshop, seminar, lecture, class, bootcamp)
+- gaming (tournament, esports, convention, lan-party, board-games)
+- networking (professional, casual, industry-specific, speed-networking, alumni)
+- outdoor (hiking, camping, sports, tour, cleanup)
+- community (gathering, volunteering, town-hall, fundraiser, celebration)
 
 User's event idea: ${prompt}
 
@@ -50,6 +65,7 @@ Rules:
 - Make title catchy and under 80 characters
 - Description should be 2-3 sentences, informative, single paragraph
 - suggestedTicketType should be either "free" or "paid"
+- CRITICAL: "category" and "subCategory" must EXACTLY match the IDs from the valid list provided. Do not invent new IDs.
 `;
 
       // puter.js is a browser-only library, so we call it directly from the client

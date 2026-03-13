@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useConvexQuery, useConvexMutation } from "@/hooks/use-convex-query";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import { useUser } from "@clerk/nextjs";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,6 +14,7 @@ import EventCard from "@/components/event-card";
 
 export default function MyEventsPage() {
   const router = useRouter();
+  const { user } = useUser();
 
   const { data: events, isLoading } = useConvexQuery(api.events.getMyEvents);
   const { mutate: deleteEvent } = useConvexMutation(api.events.deleteEvent);
@@ -78,6 +80,7 @@ export default function MyEventsPage() {
                 key={event._id}
                 event={event}
                 action="event"
+                currentUser={user}
                 onClick={() => handleEventClick(event._id)}
                 onDelete={handleDelete}
               />

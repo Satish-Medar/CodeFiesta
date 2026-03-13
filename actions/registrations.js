@@ -6,6 +6,9 @@ import Event from '@/models/Event'
 import User from '@/models/User'
 import Registration from '@/models/Registration'
 import { revalidatePath } from 'next/cache'
+import { Resend } from 'resend'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 function generateQRCode() {
   return `EVT-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`
@@ -23,6 +26,10 @@ export async function registerForEvent(data) {
 
     const event = await Event.findById(eventId)
     if (!event) throw new Error('Event not found')
+
+    if (event.organizerId.toString() === user._id.toString()) {
+      throw new Error('As the organizer, you cannot register for your own event.')
+    }
 
     if (event.registrationCount >= event.capacity) {
       throw new Error('Event is full')
@@ -51,6 +58,46 @@ export async function registerForEvent(data) {
 
     event.registrationCount += 1
     await event.save()
+
+    // Send confirmation email asynchronously
+    try {
+      await resend.emails.send({
+        from: 'Spott Events <onboarding@resend.dev>',
+        to: attendeeEmail,
+        subject: `Ticket Confirmation: ${event.title}`,
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+            <div style="background-color: #f4f4f5; padding: 24px; border-radius: 8px 8px 0 0; text-align: center;">
+              <h1 style="margin: 0; color: #18181b; font-size: 24px;">🎟️ You're Going to ${event.title}!</h1>
+            </div>
+            
+            <div style="padding: 32px 24px; border: 1px solid #e4e4e7; border-top: none; border-radius: 0 0 8px 8px;">
+              <p style="font-size: 16px; line-height: 1.5;">Hi <strong>${attendeeName}</strong>,</p>
+              <p style="font-size: 16px; line-height: 1.5;">Your registration for <strong>${event.title}</strong> is confirmed. We can't wait to see you there!</p>
+              
+              <div style="background-color: #fafafa; border: 1px dashed #d4d4d8; padding: 24px; margin: 32px 0; border-radius: 8px; text-align: center;">
+                <p style="text-transform: uppercase; font-size: 12px; font-weight: bold; color: #71717a; margin-top: 0; letter-spacing: 1px;">Your Ticket ID</p>
+                <p style="font-family: monospace; font-size: 24px; font-weight: bold; color: #18181b; margin: 8px 0;">${qrCode}</p>
+                <p style="font-size: 14px; color: #71717a; margin-bottom: 0;">Present this ID or scanning the QR code in the app at the door.</p>
+              </div>
+
+              <h3 style="margin-top: 32px; border-bottom: 2px solid #e4e4e7; padding-bottom: 8px;">Event Details</h3>
+              <ul style="list-style: none; padding: 0; margin-top: 16px; font-size: 15px;">
+                <li style="margin-bottom: 12px;">🗓️ <strong>Date:</strong> ${new Date(event.startDate).toLocaleDateString()} at ${new Date(event.startDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</li>
+                <li style="margin-bottom: 12px;">📍 <strong>Location:</strong> ${event.city}, ${event.state || event.country}</li>
+                ${event.address ? `<li style="margin-bottom: 12px;">🏢 <strong>Address:</strong> ${event.address}</li>` : ''}
+              </ul>
+
+              <hr style="border: 0; border-top: 1px solid #e4e4e7; margin: 32px 0;" />
+              <p style="font-size: 14px; color: #71717a; text-align: center; margin: 0;">Having trouble? Contact the organizer directly through the Spott platform.</p>
+            </div>
+          </div>
+        `
+      })
+    } catch (emailError) {
+      console.error('Failed to send confirmation email. Skipping...', emailError)
+      // We do not throw the error here because the Registration actually succeeded in DB
+    }
 
     revalidatePath(`/event/${event.slug}`)
     revalidatePath('/dashboard')

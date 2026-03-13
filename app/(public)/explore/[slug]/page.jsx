@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { notFound } from "next/navigation";
+import { useState, useMemo } from "react";
 import { Loader2, MapPin } from "lucide-react";
 import { useConvexQuery } from "@/hooks/use-convex-query";
 import { api } from "@/lib/api";
@@ -9,10 +10,12 @@ import { CATEGORIES } from "@/lib/data";
 import { parseLocationSlug } from "@/lib/location-utils";
 import { Badge } from "@/components/ui/badge";
 import EventCard from "@/components/event-card";
+import { useUser } from "@clerk/nextjs";
 
 export default function DynamicExplorePage() {
   const params = useParams();
   const router = useRouter();
+  const { user } = useUser();
   const slug = params.slug;
 
   // Check if it's a valid category
@@ -44,6 +47,14 @@ export default function DynamicExplorePage() {
   const handleEventClick = (eventSlug) => {
     router.push(`/events/${eventSlug}`);
   };
+
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+  
+  const filteredEvents = useMemo(() => {
+    if (!events) return [];
+    if (!selectedSubCategory) return events;
+    return events.filter(e => e.subCategory === selectedSubCategory);
+  }, [events, selectedSubCategory]);
 
   if (isLoading) {
     return (
@@ -77,19 +88,43 @@ export default function DynamicExplorePage() {
           )}
         </div>
 
-        {events && events.length > 0 ? (
+        {/* Sub-Category Filter Pills */}
+        {isCategory && categoryInfo.subCategories && categoryInfo.subCategories.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-8">
+            <Badge 
+              variant={selectedSubCategory === null ? "default" : "outline"}
+              className="cursor-pointer hover:bg-primary/90 hover:text-primary-foreground px-4 py-1.5 text-sm"
+              onClick={() => setSelectedSubCategory(null)}
+            >
+              All
+            </Badge>
+            {categoryInfo.subCategories.map((sub) => (
+              <Badge 
+                key={sub.id}
+                variant={selectedSubCategory === sub.id ? "default" : "outline"}
+                className="cursor-pointer hover:bg-primary/90 hover:text-primary-foreground px-4 py-1.5 text-sm"
+                onClick={() => setSelectedSubCategory(sub.id)}
+              >
+                {sub.label}
+              </Badge>
+            ))}
+          </div>
+        )}
+
+        {filteredEvents && filteredEvents.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {events.map((event) => (
+            {filteredEvents.map((event) => (
               <EventCard
                 key={event._id}
                 event={event}
+                currentUser={user}
                 onClick={() => handleEventClick(event.slug)}
               />
             ))}
           </div>
         ) : (
           <p className="text-muted-foreground">
-            No events found in this category.
+            {selectedSubCategory ? "No events found for this sub-category." : "No events found in this category."}
           </p>
         )}
       </>
@@ -121,12 +156,13 @@ export default function DynamicExplorePage() {
         </div>
       </div>
 
-      {events && events.length > 0 ? (
+      {filteredEvents && filteredEvents.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event) => (
+          {filteredEvents.map((event) => (
             <EventCard
               key={event._id}
               event={event}
+              currentUser={user}
               onClick={() => handleEventClick(event.slug)}
             />
           ))}

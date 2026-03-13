@@ -30,21 +30,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getCategoryIcon, getCategoryLabel } from "@/lib/data";
 import RegisterModal from "./_components/register-modal";
 
-// Utility function to darken a color
-function darkenColor(color, amount) {
-  const colorWithoutHash = color.replace("#", "");
-  const num = parseInt(colorWithoutHash, 16);
-  const r = Math.max(0, (num >> 16) - amount * 255);
-  const g = Math.max(0, ((num >> 8) & 0x00ff) - amount * 255);
-  const b = Math.max(0, (num & 0x0000ff) - amount * 255);
-  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
-}
-
 export default function EventDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { user } = useUser();
+  const { user: clerkUser } = useUser();
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+
+  const { data: dbUser } = useConvexQuery(api.users.getCurrentUser);
 
   // Fetch event details
   const { data: event, isLoading } = useConvexQuery(api.events.getEventBySlug, {
@@ -77,7 +69,7 @@ export default function EventDetailPage() {
   };
 
   const handleRegister = () => {
-    if (!user) {
+    if (!clerkUser) {
       toast.error("Please sign in to register");
       return;
     }
@@ -98,16 +90,11 @@ export default function EventDetailPage() {
 
   const isEventFull = event.registrationCount >= event.capacity;
   const isEventPast = event.endDate < Date.now();
-  const isOrganizer = user?.id === event.organizerId;
+  const isOrganizer = dbUser?._id === event.organizerId || clerkUser?.id === event.organizerId;
 
   return (
-    <div
-      style={{
-        backgroundColor: event.themeColor || "#1e3a8a",
-      }}
-      className="min-h-screen py-8 -mt-6 md:-mt-16 lg:-mx-5"
-    >
-      <div className="max-w-7xl mx-auto px-8">
+    <div className="min-h-screen py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Event Title & Info */}
         <div className="mb-8">
           <Badge variant="secondary" className="mb-3">
@@ -146,14 +133,7 @@ export default function EventDetailPage() {
           {/* Main Content */}
           <div className="space-y-8">
             {/* Description */}
-            <Card
-              className={"pt-0"}
-              style={{
-                backgroundColor: event.themeColor
-                  ? darkenColor(event.themeColor, 0.04)
-                  : "#1e3a8a",
-              }}
-            >
+            <Card className="border shadow-sm">
               <CardContent className="pt-6">
                 <h2 className="text-2xl font-bold mb-4">About This Event</h2>
                 <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
@@ -163,17 +143,10 @@ export default function EventDetailPage() {
             </Card>
 
             {/* Location Details */}
-            <Card
-              className={"pt-0"}
-              style={{
-                backgroundColor: event.themeColor
-                  ? darkenColor(event.themeColor, 0.04)
-                  : "#1e3a8a",
-              }}
-            >
+            <Card className="border shadow-sm">
               <CardContent className="pt-6">
                 <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                  <MapPin className="w-6 h-6 text-purple-500" />
+                  <MapPin className="w-5 h-5 text-muted-foreground" />
                   Location
                 </h2>
 
@@ -203,14 +176,7 @@ export default function EventDetailPage() {
             </Card>
 
             {/* Organizer Info */}
-            <Card
-              className={"pt-0"}
-              style={{
-                backgroundColor: event.themeColor
-                  ? darkenColor(event.themeColor, 0.04)
-                  : "#1e3a8a",
-              }}
-            >
+            <Card className="border shadow-sm">
               <CardContent className="pt-6">
                 <h2 className="text-2xl font-bold mb-4">Organizer</h2>
                 <div className="flex items-center gap-3">
@@ -233,15 +199,8 @@ export default function EventDetailPage() {
 
           {/* Sidebar - Registration Card */}
           <div className="lg:sticky lg:top-24 h-fit">
-            <Card
-              className={`overflow-hidden py-0`}
-              style={{
-                backgroundColor: event.themeColor
-                  ? darkenColor(event.themeColor, 0.04)
-                  : "#1e3a8a",
-              }}
-            >
-              <CardContent className="p-6 space-y-4">
+            <Card className="border shadow-sm">
+              <CardContent className="p-6 space-y-6">
                 {/* Price */}
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Price</p>

@@ -45,6 +45,7 @@
     "react-hook-form": "^7.66.0",
     "react-qr-code": "^2.0.18",
     "react-spinners": "^0.17.0",
+    "resend": "^6.9.3",
     "sonner": "^2.0.7",
     "svix": "^1.88.0",
     "tailwind-merge": "^3.3.1",

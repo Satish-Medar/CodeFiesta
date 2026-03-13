@@ -25,7 +25,7 @@ export default function Header() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-xl z-20 border-b">
+      <nav className="fixed top-0 left-0 right-0 bg-white dark:bg-zinc-950 z-20 border-b border-gray-200 dark:border-zinc-800">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center">
@@ -39,7 +39,7 @@ export default function Header() {
             />
             {/* <span className="text-purple-500 text-2xl font-bold">spott*</span> */}
             {hasPro && (
-              <Badge className="bg-linear-to-r from-pink-500 to-orange-500 gap-1 text-white ml-3">
+              <Badge variant="secondary" className="gap-1 ml-3 bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700">
                 <Crown className="w-3 h-3" />
                 Pro
               </Badge>
@@ -69,6 +69,14 @@ export default function Header() {
             </Button>
 
             <SignedIn>
+              {/* My Events Button (Desktop Quick Access) */}
+              <Button variant="ghost" size="sm" asChild className="mr-2 hidden sm:flex gap-2 text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-100">
+                <Link href="/my-events">
+                  <Building className="w-4 h-4" />
+                  My Events
+                </Link>
+              </Button>
+
               {/* Create Event Button */}
               <Button size="sm" asChild className="flex gap-2 mr-4">
                 <Link href="/create-event">
@@ -80,6 +88,7 @@ export default function Header() {
               {/* User Button */}
               <UserButton
                 afterSignOutUrl="/"
+                userProfileMode="modal"
                 appearance={{
                   elements: {
                     avatarBox: "w-9 h-9",
