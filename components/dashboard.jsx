@@ -3,12 +3,25 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
-import { setUserRole } from "@/actions/users";
+import { getCurrentUser, setUserRole } from "@/actions/users";
 
 export default function Dashboard() {
   const { user, isLoaded } = useUser();
   const searchParams = useSearchParams();
-  const [role, setRole] = useState(user?.publicMetadata?.role || "volunteer");
+  const [appUser, setAppUser] = useState(null);
+  const [role, setRole] = useState("volunteer");
+
+  useEffect(() => {
+    if (!isLoaded || !user) return;
+
+    // Load the app-specific user record (with role) from the DB
+    getCurrentUser().then((currentUser) => {
+      if (currentUser) {
+        setAppUser(currentUser);
+        setRole(currentUser.role || "volunteer");
+      }
+    });
+  }, [isLoaded, user]);
 
   useEffect(() => {
     if (!isLoaded || !user) return;
@@ -17,7 +30,10 @@ export default function Dashboard() {
     const requestedRole = searchParams.get("role");
     if (requestedRole && requestedRole !== role) {
       setUserRole(requestedRole).then((updated) => {
-        setRole(updated?.role || requestedRole);
+        if (updated) {
+          setRole(updated.role || requestedRole);
+          setAppUser(updated);
+        }
       });
     }
   }, [isLoaded, user, searchParams, role]);
