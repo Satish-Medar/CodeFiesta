@@ -1,0 +1,40 @@
+diff --git a/node_modules/@emnapi/wasi-threads/dist/wasi-threads.js b/node_modules/@emnapi/wasi-threads/dist/wasi-threads.js
+index 893dfba..eb2fc72 100644
+--- a/node_modules/@emnapi/wasi-threads/dist/wasi-threads.js
++++ b/node_modules/@emnapi/wasi-threads/dist/wasi-threads.js
+@@ -175,10 +175,14 @@
+                     var pthreadPoolSize = this._reuseWorker.size;
+                     while (pthreadPoolSize--) {
+                         var worker = this.allocateUnusedWorker();
+-                        if (ENVIRONMENT_IS_NODE) {
++                        if (ENVIRONMENT_IS_NODE && worker) {
+                             // https://github.com/nodejs/node/issues/53036
+-                            worker.once('message', function () { });
+-                            worker.unref();
++                            if (typeof worker.once === 'function') {
++                                worker.once('message', function () { });
++                            }
++                            if (typeof worker.unref === 'function') {
++                                worker.unref();
++                            }
+                         }
+                     }
+                 }
+@@ -192,14 +196,14 @@
+             var promises = Array(this.unusedWorkers.length);
+             var _loop_1 = function (i) {
+                 var worker = this_1.unusedWorkers[i];
+-                if (ENVIRONMENT_IS_NODE)
++                if (ENVIRONMENT_IS_NODE && worker && typeof worker.ref === 'function')
+                     worker.ref();
+                 promises[i] = this_1.loadWasmModuleToWorker(worker).then(function (w) {
+-                    if (ENVIRONMENT_IS_NODE)
++                    if (ENVIRONMENT_IS_NODE && worker && typeof worker.unref === 'function')
+                         worker.unref();
+                     return w;
+                 }, function (e) {
+-                    if (ENVIRONMENT_IS_NODE)
++                    if (ENVIRONMENT_IS_NODE && worker && typeof worker.unref === 'function')
+                         worker.unref();
+                     throw e;
+                 });
