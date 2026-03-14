@@ -14,26 +14,40 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-export default function QRScannerModal({ isOpen, onClose }) {
+export default function QRScannerModal({ isOpen, onClose, onCheckInSuccess }) {
   const [scannerReady, setScannerReady] = useState(false);
   const [error, setError] = useState(null);
 
   const { mutate: checkInAttendee } = useConvexMutation(
-    api.registrations.checkInAttendee
+    api.registrations.checkInAttendee,
   );
 
+  const [manualCode, setManualCode] = useState("");
+  const [isCheckingIn, setIsCheckingIn] = useState(false);
+
   const handleCheckIn = async (qrCode) => {
+    if (!qrCode || typeof qrCode !== "string") {
+      toast.error("Please provide a valid ticket code.");
+      return;
+    }
+
+    setIsCheckingIn(true);
     try {
-      const result = await checkInAttendee({ qrCode });
+      const normalized = qrCode.trim().toUpperCase();
+      const result = await checkInAttendee({ qrCode: normalized });
 
       if (result.success) {
         toast.success("✅ Check-in successful!");
+        setManualCode("");
         onClose();
+        onCheckInSuccess?.();
       } else {
         toast.error(result.message || "Check-in failed");
       }
     } catch (error) {
       toast.error(error.message || "Invalid QR code");
+    } finally {
+      setIsCheckingIn(false);
     }
   };
 
@@ -76,7 +90,7 @@ export default function QRScannerModal({ isOpen, onClose }) {
               facingMode: "environment", // Use back camera on mobile
             },
           },
-          /* verbose= */ false
+          /* verbose= */ false,
         );
 
         const onScanSuccess = (decodedText) => {
@@ -147,11 +161,35 @@ export default function QRScannerModal({ isOpen, onClose }) {
                 </span>
               </div>
             )}
-            <p className="text-sm text-muted-foreground text-center">
-              {scannerReady
-                ? "Position the QR code within the frame"
-                : "Please allow camera access when prompted"}
-            </p>
+
+            {/* Manual entry fallback */}
+            <div className="mt-4 space-y-2">
+              <p className="text-sm text-muted-foreground text-center">
+                {scannerReady
+                  ? "Position the QR code within the frame"
+                  : "Please allow camera access when prompted"}
+              </p>
+              <div className="flex items-center gap-2">
+                <input
+                  value={manualCode}
+                  onChange={(e) => setManualCode(e.target.value)}
+                  placeholder="Enter ticket ID manually"
+                  className="flex-1 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-200"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleCheckIn(manualCode)}
+                  disabled={isCheckingIn}
+                  className="inline-flex items-center justify-center rounded-md bg-purple-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isCheckingIn ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Check In"
+                  )}
+                </button>
+              </div>
+            </div>
           </>
         )}
       </DialogContent>

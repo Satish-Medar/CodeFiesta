@@ -42,25 +42,29 @@ export default function EventDashboardPage() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [showQRScanner, setShowQRScanner] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Fetch event dashboard data
   const { data: dashboardData, isLoading } = useConvexQuery(
     api.dashboard.getEventDashboard,
-    { eventId }
+    { eventId, refreshKey },
   );
 
   // Fetch registrations
   const { data: registrations, isLoading: loadingRegistrations } =
-    useConvexQuery(api.registrations.getEventRegistrations, { eventId });
+    useConvexQuery(api.registrations.getEventRegistrations, {
+      eventId,
+      refreshKey,
+    });
 
   // Delete event mutation
   const { mutate: deleteEvent, isLoading: isDeleting } = useConvexMutation(
-    api.dashboard.deleteEvent
+    api.dashboard.deleteEvent,
   );
 
   const handleDelete = async () => {
     const confirmed = window.confirm(
-      "Are you sure you want to delete this event? This action cannot be undone and will permanently delete the event and all associated registrations."
+      "Are you sure you want to delete this event? This action cannot be undone and will permanently delete the event and all associated registrations.",
     );
 
     if (!confirmed) return;
@@ -362,6 +366,7 @@ export default function EventDashboardPage() {
         <QRScannerModal
           isOpen={showQRScanner}
           onClose={() => setShowQRScanner(false)}
+          onCheckInSuccess={() => setRefreshKey((prev) => prev + 1)}
         />
       )}
     </div>
