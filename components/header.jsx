@@ -122,9 +122,14 @@ export default function Header() {
                 </div>
               </>
             ) : (
-              <SignInButton mode="modal">
-                <Button size="sm">Sign In</Button>
-              </SignInButton>
+              <>
+                <Button variant="ghost" size="sm" asChild className="mr-2">
+                  <Link href="/sign-in">Sign In</Link>
+                </Button>
+                <Button variant="secondary" size="sm" asChild>
+                  <Link href="/sign-up">Sign Up</Link>
+                </Button>
+              </>
             )}
 
             <div className="flex items-center gap-2 ml-2">
