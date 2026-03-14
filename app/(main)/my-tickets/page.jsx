@@ -26,7 +26,7 @@ export default function MyTicketsPage() {
   const [selectedTicket, setSelectedTicket] = useState(null);
 
   const { data: registrations, isLoading } = useConvexQuery(
-    api.registrations.getMyRegistrations
+    api.registrations.getMyRegistrations,
   );
 
   const { mutate: cancelRegistration, isLoading: isCancelling } =
@@ -54,13 +54,20 @@ export default function MyTicketsPage() {
 
   const now = Date.now();
 
+  // Treat an event as "upcoming" until it has fully ended (endDate in the future)
   const upcomingTickets = registrations?.filter(
     (reg) =>
-      reg.event && new Date(reg.event.startDate).getTime() >= now && reg.status === "confirmed"
+      reg.event &&
+      new Date(reg.event.endDate).getTime() >= now &&
+      reg.status === "confirmed",
   );
+
+  // Past tickets include events that have ended or registrations that were cancelled
   const pastTickets = registrations?.filter(
     (reg) =>
-      reg.event && (new Date(reg.event.startDate).getTime() < now || reg.status === "cancelled")
+      reg.event &&
+      (new Date(reg.event.endDate).getTime() < now ||
+        reg.status === "cancelled"),
   );
 
   return (
@@ -102,7 +109,8 @@ export default function MyTicketsPage() {
                 <EventCard
                   key={registration._id}
                   event={registration.event}
-                  action={null}
+                  action="ticket"
+                  onClick={() => setSelectedTicket(registration)}
                   className="opacity-60"
                 />
               ))}
