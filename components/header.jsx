@@ -95,35 +95,30 @@ export default function Header() {
                   </Link>
                 </Button>
 
-                {/* Theme Toggle & User Button Container */}
-                <div className="flex items-center gap-2 ml-2">
-                  <ThemeToggle />
-
-                  <div className="border border-gray-200 dark:border-zinc-800 rounded-full bg-white dark:bg-zinc-900 overflow-hidden flex items-center justify-center p-[2px]">
-                    <UserButton
-                      afterSignOutUrl="/"
-                      userProfileMode="modal"
-                      appearance={{
-                        elements: {
-                          avatarBox: "w-8 h-8 rounded-full",
-                        },
-                      }}
-                    >
-                      <UserButton.MenuItems>
-                        <UserButton.Link
-                          label="My Tickets"
-                          labelIcon={<Ticket size={16} />}
-                          href="/my-tickets"
-                        />
-                        <UserButton.Link
-                          label="My Events"
-                          labelIcon={<Building size={16} />}
-                          href="/my-events"
-                        />
-                        <UserButton.Action label="manageAccount" />
-                      </UserButton.MenuItems>
-                    </UserButton>
-                  </div>
+                <div className="border border-gray-200 dark:border-zinc-800 rounded-full bg-white dark:bg-zinc-900 overflow-hidden flex items-center justify-center p-[2px]">
+                  <UserButton
+                    afterSignOutUrl="/"
+                    userProfileMode="modal"
+                    appearance={{
+                      elements: {
+                        avatarBox: "w-8 h-8 rounded-full",
+                      },
+                    }}
+                  >
+                    <UserButton.MenuItems>
+                      <UserButton.Link
+                        label="My Tickets"
+                        labelIcon={<Ticket size={16} />}
+                        href="/my-tickets"
+                      />
+                      <UserButton.Link
+                        label="My Events"
+                        labelIcon={<Building size={16} />}
+                        href="/my-events"
+                      />
+                      <UserButton.Action label="manageAccount" />
+                    </UserButton.MenuItems>
+                  </UserButton>
                 </div>
               </>
             ) : (
@@ -131,6 +126,10 @@ export default function Header() {
                 <Button size="sm">Sign In</Button>
               </SignInButton>
             )}
+
+            <div className="flex items-center gap-2 ml-2">
+              <ThemeToggle />
+            </div>
           </div>
         </div>
 
