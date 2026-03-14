@@ -87,6 +87,19 @@ export default function Header() {
                   </Link>
                 </Button>
 
+                {/* Dashboard Button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                  className="mr-2 hidden sm:flex gap-2 text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                >
+                  <Link href="/dashboard">
+                    <Sparkles className="w-4 h-4" />
+                    <span className="hidden sm:inline">Dashboard</span>
+                  </Link>
+                </Button>
+
                 {/* Create Event Button */}
                 <Button size="sm" asChild className="flex gap-2 mr-4">
                   <Link href="/create-event">
