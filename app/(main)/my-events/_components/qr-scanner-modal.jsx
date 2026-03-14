@@ -62,16 +62,6 @@ export default function QRScannerModal({ isOpen, onClose, onCheckInSuccess }) {
       try {
         console.log("Initializing QR scanner...");
 
-        // Check camera permissions first
-        try {
-          await navigator.mediaDevices.getUserMedia({ video: true });
-          console.log("Camera permission granted");
-        } catch (permError) {
-          console.error("Camera permission denied:", permError);
-          setError("Camera permission denied. Please enable camera access.");
-          return;
-        }
-
         // Dynamically import the library
         const { Html5QrcodeScanner } = await import("html5-qrcode");
 

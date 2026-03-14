@@ -223,7 +223,17 @@ export default function EventDashboardPage() {
           <Button
             size="lg"
             className="mb-8 w-full gap-2 h-10 bg-slate-900 text-slate-50 hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
-            onClick={() => setShowQRScanner(true)}
+            onClick={async () => {
+              try {
+                // Request camera access as a direct user gesture to ensure permissions prompt
+                await navigator.mediaDevices.getUserMedia({ video: true });
+                setShowQRScanner(true);
+              } catch (err) {
+                toast.error(
+                  "Camera access is required to scan QR codes. Please allow camera access.",
+                );
+              }
+            }}
           >
             <QrCode className="w-6 h-6" />
             Scan QR Code to Check-In
@@ -350,6 +360,7 @@ export default function EventDashboardPage() {
                 <AttendeeCard
                   key={registration._id}
                   registration={registration}
+                  onCheckInSuccess={() => setRefreshKey((prev) => prev + 1)}
                 />
               ))
             ) : (
