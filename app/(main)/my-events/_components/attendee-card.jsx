@@ -46,14 +46,22 @@ export function AttendeeCard({ registration, onCheckInSuccess }) {
           <p className="text-sm text-muted-foreground mb-2">
             {registration.attendeeEmail}
           </p>
-          <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-            <span>
+          <div className="flex flex-wrap gap-3 text-xs">
+            <span
+              className={
+                registration.checkedIn
+                  ? "text-green-600 font-semibold"
+                  : "text-muted-foreground"
+              }
+            >
               {registration.checkedIn ? "⏰ Checked in" : "📅 Registered"}{" "}
               {registration.checkedIn && registration.checkedInAt
                 ? format(registration.checkedInAt, "PPp")
                 : format(registration.createdAt, "PPp")}
             </span>
-            <span className="font-mono">QR: {registration.qrCode}</span>
+            <span className="font-mono text-muted-foreground">
+              QR: {registration.qrCode}
+            </span>
           </div>
         </div>
 
