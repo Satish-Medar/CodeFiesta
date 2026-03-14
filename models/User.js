@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
@@ -33,12 +33,17 @@ const UserSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    role: {
+      type: String,
+      enum: ["organizer", "volunteer"],
+      default: "volunteer",
+    },
     freeEventsCreated: {
       type: Number,
       default: 0,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export default mongoose.models.User || mongoose.model('User', UserSchema);
+export default mongoose.models.User || mongoose.model("User", UserSchema);
