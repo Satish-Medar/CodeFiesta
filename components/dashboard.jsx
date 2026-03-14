@@ -9,7 +9,7 @@ export default function Dashboard() {
   const { user, isLoaded } = useUser();
   const searchParams = useSearchParams();
   const [appUser, setAppUser] = useState(null);
-  const [role, setRole] = useState("volunteer");
+  const [role, setRole] = useState("");
 
   useEffect(() => {
     if (!isLoaded || !user) return;
@@ -50,19 +50,25 @@ export default function Dashboard() {
   const roleNotSet = !appUser?.role;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950 text-slate-900 dark:text-white px-4 py-20">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <header className="rounded-2xl border border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 p-10 shadow-sm">
-          <h1 className="text-4xl font-bold tracking-tight">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-pink-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 text-slate-900 dark:text-white px-4 py-20">
+      <div className="max-w-4xl mx-auto space-y-10">
+        <header className="rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-10 shadow-lg flex flex-col items-center">
+          <img
+            src={user.imageUrl}
+            alt="Profile"
+            className="w-24 h-24 rounded-full border-4 border-blue-200 shadow-md mb-4"
+          />
+          <h1 className="text-4xl font-extrabold tracking-tight text-center">
             {user.firstName || user.fullName || "Welcome"}
           </h1>
-          <p className="mt-2 text-lg text-gray-600 dark:text-slate-300">
+          <p className="mt-2 text-lg text-blue-600 dark:text-pink-300 font-medium text-center">
             {displayRole === "organizer"
               ? "Organizer Dashboard"
-              : "Volunteer Dashboard"}
+              : displayRole === "volunteer"
+                ? "Volunteer Dashboard"
+                : "Participant Dashboard"}
           </p>
-
-          <div className="mt-6 flex flex-col gap-2 text-sm text-gray-700 dark:text-slate-300">
+          <div className="mt-6 flex flex-col gap-2 text-base text-gray-700 dark:text-slate-300 items-center">
             <div>
               <span className="font-semibold">Name:</span>{" "}
               {user.fullName || user.firstName || "N/A"}
@@ -78,27 +84,51 @@ export default function Dashboard() {
           </div>
         </header>
 
-        <section className="grid gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl border border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 p-8">
-            <h2 className="text-2xl font-semibold mb-4">Quick Actions</h2>
+        <section className="grid gap-8 lg:grid-cols-3">
+          <div className="rounded-2xl border border-blue-200 dark:border-pink-400 bg-blue-50 dark:bg-zinc-900 p-8 shadow-md">
+            <h2 className="text-2xl font-semibold mb-4 text-blue-700 dark:text-pink-200">
+              Quick Actions
+            </h2>
             {displayRole === "organizer" ? (
-              <ul className="space-y-2 text-gray-700 dark:text-slate-300">
+              <ul className="space-y-2 text-blue-900 dark:text-pink-100">
                 <li>• Create a new event</li>
                 <li>• Manage attendees</li>
                 <li>• View event analytics</li>
               </ul>
-            ) : (
-              <ul className="space-y-2 text-gray-700 dark:text-slate-300">
+            ) : displayRole === "volunteer" ? (
+              <ul className="space-y-2 text-blue-900 dark:text-pink-100">
                 <li>• Browse upcoming events</li>
                 <li>• Join volunteer teams</li>
                 <li>• Track your schedule</li>
               </ul>
+            ) : (
+              <ul className="space-y-2 text-blue-900 dark:text-pink-100">
+                <li>• View your tickets</li>
+                <li>• See your registered events</li>
+                <li>• Update your profile</li>
+              </ul>
             )}
           </div>
 
-          <div className="rounded-2xl border border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900 p-8">
-            <h2 className="text-2xl font-semibold mb-4">Tips</h2>
-            <p className="text-gray-700 dark:text-slate-300">
+          <div className="rounded-2xl border border-green-200 dark:border-green-400 bg-green-50 dark:bg-zinc-900 p-8 shadow-md">
+            <h2 className="text-2xl font-semibold mb-4 text-green-700 dark:text-green-200">
+              Participant Dashboard
+            </h2>
+            <ul className="space-y-2 text-green-900 dark:text-green-100">
+              <li>• Your upcoming events</li>
+              <li>• Your tickets and registrations</li>
+              <li>• Profile & settings</li>
+            </ul>
+            <p className="mt-4 text-sm text-green-700 dark:text-green-200">
+              All your event info in one place!
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-yellow-200 dark:border-yellow-400 bg-yellow-50 dark:bg-zinc-900 p-8 shadow-md">
+            <h2 className="text-2xl font-semibold mb-4 text-yellow-700 dark:text-yellow-200">
+              Tips
+            </h2>
+            <p className="text-yellow-900 dark:text-yellow-100">
               Use the navigation to jump between screens. Your role determines
               the tools available to you.
             </p>

@@ -28,22 +28,13 @@ export async function getCurrentUser() {
         `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() ||
         "Anonymous";
 
-      // Try to get role from query param if available
-      let role = "volunteer";
-      if (typeof window !== "undefined") {
-        const params = new URLSearchParams(window.location.search);
-        const qRole = params.get("role");
-        if (qRole === "organizer" || qRole === "volunteer") {
-          role = qRole;
-        }
-      }
-
       user = await User.create({
         clerkId: clerkUser.id,
         email,
         name,
         imageUrl: clerkUser.imageUrl,
-        role,
+        // Default role is volunteer; will be updated by setUserRole if needed
+        role: "volunteer",
       });
     }
 
