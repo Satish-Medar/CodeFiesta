@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Building, Crown, Plus, Sparkles, Ticket } from "lucide-react";
-import { SignInButton, useAuth, UserButton, useUser, SignedIn, SignedOut } from "@clerk/nextjs";
+import { SignInButton, useAuth, UserButton, useUser } from "@clerk/nextjs";
 import { BarLoader } from "react-spinners";
 import { useOnboarding } from "@/hooks/use-onboarding";
 import OnboardingModal from "./onboarding-modal";
@@ -17,11 +17,11 @@ import { ThemeToggle } from "./theme-toggle";
 export default function Header() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
-
   const { showOnboarding, handleOnboardingComplete, handleOnboardingSkip } =
     useOnboarding();
 
   const { has } = useAuth();
+  const { isLoaded, isSignedIn } = useUser();
   const hasPro = has?.({ plan: "pro" });
 
   return (
@@ -40,7 +40,10 @@ export default function Header() {
             />
             {/* <span className="text-purple-500 text-2xl font-bold">spott*</span> */}
             {hasPro && (
-              <Badge variant="secondary" className="gap-1 ml-3 bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700">
+              <Badge
+                variant="secondary"
+                className="gap-1 ml-3 bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+              >
                 <Crown className="w-3 h-3" />
                 Pro
               </Badge>
@@ -69,60 +72,65 @@ export default function Header() {
               <Link href="/explore">Explore</Link>
             </Button>
 
-            <SignedIn>
-              {/* My Events Button (Desktop Quick Access) */}
-              <Button variant="ghost" size="sm" asChild className="mr-2 hidden sm:flex gap-2 text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-100">
-                <Link href="/my-events">
-                  <Building className="w-4 h-4" />
-                  My Events
-                </Link>
-              </Button>
+            {isLoaded && isSignedIn ? (
+              <>
+                {/* My Events Button (Desktop Quick Access) */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                  className="mr-2 hidden sm:flex gap-2 text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                >
+                  <Link href="/my-events">
+                    <Building className="w-4 h-4" />
+                    My Events
+                  </Link>
+                </Button>
 
-              {/* Create Event Button */}
-              <Button size="sm" asChild className="flex gap-2 mr-4">
-                <Link href="/create-event">
-                  <Plus className="w-4 h-4" />
-                  <span className="hidden sm:inline">Create Event</span>
-                </Link>
-              </Button>
+                {/* Create Event Button */}
+                <Button size="sm" asChild className="flex gap-2 mr-4">
+                  <Link href="/create-event">
+                    <Plus className="w-4 h-4" />
+                    <span className="hidden sm:inline">Create Event</span>
+                  </Link>
+                </Button>
 
-              {/* Theme Toggle & User Button Container */}
-              <div className="flex items-center gap-2 ml-2">
-                <ThemeToggle />
-                
-                <div className="border border-gray-200 dark:border-zinc-800 rounded-full bg-white dark:bg-zinc-900 overflow-hidden flex items-center justify-center p-[2px]">
-                  <UserButton
-                    afterSignOutUrl="/"
-                    userProfileMode="modal"
-                    appearance={{
-                      elements: {
-                        avatarBox: "w-8 h-8 rounded-full",
-                      },
-                    }}
-                  >
-                    <UserButton.MenuItems>
-                      <UserButton.Link
-                        label="My Tickets"
-                        labelIcon={<Ticket size={16} />}
-                        href="/my-tickets"
-                      />
-                      <UserButton.Link
-                        label="My Events"
-                        labelIcon={<Building size={16} />}
-                        href="/my-events"
-                      />
-                      <UserButton.Action label="manageAccount" />
-                    </UserButton.MenuItems>
-                  </UserButton>
+                {/* Theme Toggle & User Button Container */}
+                <div className="flex items-center gap-2 ml-2">
+                  <ThemeToggle />
+
+                  <div className="border border-gray-200 dark:border-zinc-800 rounded-full bg-white dark:bg-zinc-900 overflow-hidden flex items-center justify-center p-[2px]">
+                    <UserButton
+                      afterSignOutUrl="/"
+                      userProfileMode="modal"
+                      appearance={{
+                        elements: {
+                          avatarBox: "w-8 h-8 rounded-full",
+                        },
+                      }}
+                    >
+                      <UserButton.MenuItems>
+                        <UserButton.Link
+                          label="My Tickets"
+                          labelIcon={<Ticket size={16} />}
+                          href="/my-tickets"
+                        />
+                        <UserButton.Link
+                          label="My Events"
+                          labelIcon={<Building size={16} />}
+                          href="/my-events"
+                        />
+                        <UserButton.Action label="manageAccount" />
+                      </UserButton.MenuItems>
+                    </UserButton>
+                  </div>
                 </div>
-              </div>
-            </SignedIn>
-
-            <SignedOut>
+              </>
+            ) : (
               <SignInButton mode="modal">
                 <Button size="sm">Sign In</Button>
               </SignInButton>
-            </SignedOut>
+            )}
           </div>
         </div>
 
@@ -130,7 +138,6 @@ export default function Header() {
         <div className="md:hidden border-t px-3 py-3">
           <SearchLocationBar />
         </div>
-
       </nav>
 
       {/* Onboarding Modal */}
