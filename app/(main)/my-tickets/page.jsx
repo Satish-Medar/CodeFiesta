@@ -153,9 +153,21 @@ export default function MyTicketsPage() {
                 <p className="font-semibold mb-1">
                   {selectedTicket.attendeeName}
                 </p>
-                <p className="text-sm text-muted-foreground mb-4">
+                <p className="text-sm text-muted-foreground">
                   {selectedTicket.event.title}
                 </p>
+                {selectedTicket.checkedIn ? (
+                  <p className="mt-2 text-sm font-semibold text-green-600">
+                    ✅ Checked in at{" "}
+                    {selectedTicket.checkedInAt
+                      ? format(selectedTicket.checkedInAt, "PPp")
+                      : "—"}
+                  </p>
+                ) : (
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    ❌ Not checked in yet
+                  </p>
+                )}
               </div>
 
               <div className="flex justify-center p-6 bg-white rounded-lg">
