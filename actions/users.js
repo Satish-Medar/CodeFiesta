@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
 import { revalidatePath } from "next/cache";
@@ -28,11 +28,22 @@ export async function getCurrentUser() {
         `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() ||
         "Anonymous";
 
+      // Try to get role from query param if available
+      let role = "volunteer";
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        const qRole = params.get("role");
+        if (qRole === "organizer" || qRole === "volunteer") {
+          role = qRole;
+        }
+      }
+
       user = await User.create({
         clerkId: clerkUser.id,
         email,
         name,
         imageUrl: clerkUser.imageUrl,
+        role,
       });
     }
 
