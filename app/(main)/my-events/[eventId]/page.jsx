@@ -33,6 +33,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCategoryIcon, getCategoryLabel } from "@/lib/data";
 import QRScannerModal from "../_components/qr-scanner-modal";
 import { AttendeeCard } from "../_components/attendee-card";
+import ScorecardsList from "@/components/scorecards-list";
+import LiveStreamManager from "@/components/live-stream-manager";
 
 export default function EventDashboardPage() {
   const params = useParams();
@@ -315,14 +317,14 @@ export default function EventDashboardPage() {
           </Card>
         </div>
 
-        {/* Attendee Management */}
-        <h2 className="text-2xl font-bold mb-4">Attendee Management</h2>
+        {/* Attendee Management and Scorecards */}
+        <h2 className="text-2xl font-bold mb-4">Event Management</h2>
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-4">
             <TabsTrigger value="all">
-              All ({stats.totalRegistrations})
+              All Attendees ({stats.totalRegistrations})
             </TabsTrigger>
             <TabsTrigger value="checked-in">
               Checked In ({stats.checkedInCount})
@@ -330,44 +332,60 @@ export default function EventDashboardPage() {
             <TabsTrigger value="pending">
               Pending ({stats.pendingCount})
             </TabsTrigger>
+            <TabsTrigger value="scorecards">Scorecards</TabsTrigger>
+            <TabsTrigger value="livestream">🔴 Live Stream</TabsTrigger>
           </TabsList>
 
           {/* Search and Actions */}
-          <div className="flex gap-3 mb-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by name, email, or QR code..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
+          {activeTab !== "scorecards" && (
+            <div className="flex gap-3 mb-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name, email, or QR code..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Button
+                variant="outline"
+                onClick={handleExportCSV}
+                className="gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Export CSV
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              onClick={handleExportCSV}
-              className="gap-2"
-            >
-              <Download className="w-4 h-4" />
-              Export CSV
-            </Button>
-          </div>
+          )}
 
           {/* Attendee List */}
-          <TabsContent value={activeTab} className="space-y-3 mt-0">
-            {filteredRegistrations && filteredRegistrations.length > 0 ? (
-              filteredRegistrations.map((registration) => (
-                <AttendeeCard
-                  key={registration._id}
-                  registration={registration}
-                  onCheckInSuccess={() => setRefreshKey((prev) => prev + 1)}
-                />
-              ))
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                No attendees found
-              </div>
-            )}
+          {activeTab !== "scorecards" && (
+            <TabsContent value={activeTab} className="space-y-3 mt-0">
+              {filteredRegistrations && filteredRegistrations.length > 0 ? (
+                filteredRegistrations.map((registration) => (
+                  <AttendeeCard
+                    key={registration._id}
+                    registration={registration}
+                    onCheckInSuccess={() => setRefreshKey((prev) => prev + 1)}
+                  />
+                ))
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  No attendees found
+                </div>
+              )}
+            </TabsContent>
+          )}
+
+          {/* Scorecards Tab */}
+          <TabsContent value="scorecards" className="mt-0">
+            <ScorecardsList eventId={eventId} />
+          </TabsContent>
+
+          {/* Live Stream Tab */}
+          <TabsContent value="livestream" className="mt-0">
+            <LiveStreamManager eventId={eventId} />
           </TabsContent>
         </Tabs>
       </div>

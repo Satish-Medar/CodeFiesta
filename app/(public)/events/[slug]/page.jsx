@@ -29,6 +29,7 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getCategoryIcon, getCategoryLabel } from "@/lib/data";
 import RegisterModal from "./_components/register-modal";
+import LiveStreamViewer from "@/components/live-stream-viewer";
 
 export default function EventDetailPage() {
   const params = useParams();
@@ -132,6 +133,9 @@ export default function EventDetailPage() {
         <div className="grid lg:grid-cols-[1fr_380px] gap-8">
           {/* Main Content */}
           <div className="space-y-8">
+            {/* Live Stream Embed (shown if organizer has set one) */}
+            <LiveStreamViewer eventId={event._id} />
+
             {/* Description */}
             <Card className="border shadow-sm">
               <CardContent className="pt-6">
